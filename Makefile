@@ -1,5 +1,5 @@
 NVCC := nvcc
-CFLAGS := -O3
+CFLAGS := -O2 -std=c++11
 
 all: softmaxV1 softmaxV2
 
