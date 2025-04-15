@@ -9,8 +9,5 @@ softmaxV1: softmaxV1.cu
 softmaxV2: softmaxV2.cu
 	$(NVCC) $(CFLAGS) softmaxV2.cu -o softmaxV2
 
-softmaxV3: softmaxV3.cu
-	$(NVCC) $(CFLAGS) softmaxV3.cu -o softmaxV3
-
 clean:
 	rm -f softmaxV1 softmaxV2
