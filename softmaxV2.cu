@@ -8,15 +8,11 @@
 // The cuda kernel with shared memory optimization
 __global__ void softmax_kernel(float* input, float* output, int rows, int cols) {
   __shared__ float smem[1024];
-
-  // int row = blockIdx.x * blockDim.x + threadIdx.x;
   int index = blockIdx.x * cols;
   int threadId = threadIdx.x;
   
   if (blockIdx.x < rows) {
-    float local_max = -10e9f;
-    float prev_max = 0.0f;
-    float local_sum = 0.0f;
+    float local_max = -10e9f; float prev_max = 0.0f; float local_sum = 0.0f;
 
     for (int sub_i=threadId; sub_i<cols; sub_i+=blockDim.x) {
       if (input[index+sub_i] > local_max) {
@@ -27,9 +23,7 @@ __global__ void softmax_kernel(float* input, float* output, int rows, int cols) 
           local_sum += exp(input[index+sub_i] - local_max);    // no correction needed
         }
     }
-
-    if (local_max == -10e9) return;
-
+    if (local_max == -10e9) return; // stop computation if no local max found (rare edge case)
     // reduce local max down to 1 value across threads
     smem[threadId] = local_max;
     __syncthreads();
