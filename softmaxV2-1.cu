@@ -12,15 +12,14 @@ __global__ void softmax_kernel(float* input, float* output, int rows, int cols) 
   int threadId = threadIdx.x;
   
   if (blockIdx.x < rows) {
-    float local_max = -10e9f; float prev_max = 0.0f; float local_sum = 0.0f;
-
-    for (int sub_i=threadId; sub_i<cols; sub_i+=blockDim.x) {
-      if (input[index+sub_i] > local_max) {
-          prev_max = local_max;
-          local_max = input[index+sub_i];
-          local_sum = local_sum * exp(prev_max - local_max) + exp(input[index+sub_i] - local_max);  // correct and add current term
+    float row_max = -10e9f; float prev_max = 0.0f; float row_sum = 0.0f;
+    for (int sub_i=0; sub_i<cols; sub_i++) {
+      if (input[index+sub_i] > row_max) {
+          prev_max = row_max;
+          row_max = input[index+sub_i];
+          row_sum = row_sum * exp(prev_max - row_max) + exp(input[index+sub_i] - row_max);  // correct and add current term
         } else {  
-          local_sum += exp(input[index+sub_i] - local_max);    // no correction needed
+          row_sum += exp(input[index+sub_i] - row_max);    // no correction needed
         }
     }
     if (local_max == -10e9) return; // stop computation if no local max found (rare edge case)
